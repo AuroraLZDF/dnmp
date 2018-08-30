@@ -24,8 +24,6 @@ DNMP项目特点：
 │   ├── mysql.cnf           MySQL用户配置文件
 │   ├── php-fpm.conf        PHP-FPM配置文件（部分会覆盖php.ini配置）
 │   └── php.ini             PHP默认配置文件
-├── docker-compose54.yml    PHP5.4 docker-compose项目文件
-├── docker-compose56.yml    PHP5.6 docker-compose项目文件
 ├── docker-compose.yml      PHP最新版docker-compose项目文件
 ├── log                     Nginx日志目录
 ├── mysql                   MySQL数据目录
@@ -38,6 +36,15 @@ DNMP项目特点：
 
 
 ## 2. 快速使用
+1. 创建相关目录：
+```bash
+sudo mkdir /www                 # 仓库根目录
+sudo mkdir /www/code            # 代码仓库根目录 
+sudo mkdir /www/code/html       # 存放 localhost 默认文件
+sudo mdkir /www/data/mysql      # MySQL 数据库文件存放位置
+sudo mdkir /www/vhost        # nginx 虚拟主机文件存放位置
+...                             # 根据个人喜好自行调整
+```
 1. 本地安装`git`、`docker`和`docker-compose`。
 2. `clone`项目：
     ```
@@ -59,26 +66,11 @@ DNMP项目特点：
 这是项目的演示效果，PHP代码在这个目录：`./www/site1/`。
 
 
-## 3. 使用其他PHP版本？
+## 3. 使用其他PHP版本？（怎么可能呢，php7这么好，哈哈）
 默认情况下，我们启动的是**最新版本的PHP**，命令如下：
 ```
 $ docker-compose up
 ```
-在`docker-compose stop`后，我们可以用下面的命令启动**PHP5.4**或**PHP5.6**:
-```
-$ docker-compose -f docker-compose54.yml up
-$ docker-compose -f docker-compose56.yml up
-```
-如果该版本是第一次启动，那么还需要加上`--build`参数构建，不然还是会启动最新版本：
-```
-$ docker-compose -f docker-compose54.yml up --build
-$ docker-compose -f docker-compose56.yml up --build
-```
-在版本切换时，我们不需要修改任何配置文件，包括Nginx配置文件和php.ini等，
-除非是代码兼容错误，否则切换版本后应该都能正常工作。
-
-> 注意：因为所有PHP版本使用的是同一个端口配置，所以我们同时只能使用一个版本，要切换到另外一个版本，必须先停止原来的版本。
-
 
 ## 4. HTTPS和HTTP/2
 本项目的演示站点有两个：
@@ -137,7 +129,7 @@ log-error               = /var/lib/mysql/mysql.error.log
 ```
 以上是mysql.conf中的日志文件的配置。
 
-## 6. 使用composer
+## 6. 使用 <span style="color:red;">Composer</span>
 dnmp默认已经在容器中安装了composer，使用时先进入容器：
 ```
 $ docker exec -it dnmp_php_1 /bin/bash
@@ -149,7 +141,7 @@ $ docker exec -it dnmp_php_1 /bin/bash
 ```
 因为composer依赖于PHP，所以，是必须在容器里面操作composer的。
 
-## 7. phpmyadmin和phpredisadmin
+## 7. phpmyadmin 和 phpredisadmin
 本项目默认在`docker-compose.yml`中开启了用于MySQL在线管理的*phpMyAdmin*，以及用于redis在线管理的*phpRedisAdmin*，可以根据需要修改或删除。
 
 ### 7.1 phpMyAdmin
@@ -175,7 +167,7 @@ Redis连接信息如下：
 - port: `6379`
 
 
-## 8 使用XDEBUG调试
+## 8 使用 XDEBUG 调试
 默认情况下，我们已经安装了Xdebug扩展，但并未在php.ini中配置启用。
 
 要使用xdebug调试，在php.ini文件最后加上这几行：
@@ -195,8 +187,9 @@ xdebug.remote_log = "/var/log/dnmp/php.xdebug.log"
 
 说明：**这个问题主要是受国内网络环境影响，现在PHP7以上的版本直接采用从源码安装扩展，所以这个问题已经没有了。**
 
-2. PHP5.6错误“ibfreetype6-dev : Depends: zlib1g-dev but it is not going to be installed or libz-dev”
-    > 请参考： https://github.com/yeszao/dnmp/issues/39
+2. 去除了 PHP7 之前版本的配置及相关文件。
+
+3. 使用 MySQL8  镜像登录有问题，这里降级到  MySQL5.7，就可以正常登陆了。
 
 ## License
 MIT
